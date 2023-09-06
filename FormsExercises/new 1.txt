@@ -1,0 +1,20 @@
+Declare
+	v_search varchar2(100);
+	v_where varchar2(1000);
+	v_column_list varchar2(1000);
+begin
+	v_search := :POLE_TEKSTOWE5;
+	IF v_search IS NOT NULL THEN
+		v_column_list := '';
+		for i in 1..Get_block_property('block_name',number_of_columns) loop
+		end loop;
+		v_column_list := RTRIM(v_column_list,',');
+		
+		v_where :='WHERE 1=0';
+		for i in 1..Get_block_property('name',number_of_columns) loop
+			v_where := v_where || 'OR' || GET_BLOCK_PROPERTY('block_name',COLUMN_NAME,i)||'LIKE'''||v_search||'%''';
+		end loop;
+		set_BLOCK_PROPERTY('block_name',DEFAULT_WHERE, v_where);
+		execute_query;
+		end if;
+		end;

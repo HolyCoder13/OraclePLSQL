@@ -1,0 +1,12 @@
+Declare
+	v_search varchar2(100);
+begin
+	v_search := :POLE_TEKSTOWE5;
+	if v_search IS NOT NULL THEN
+		SET_BLOCK_PROPERTY(
+		'block_name',
+		DEFAULT_WHERE,
+		'columns_name LIKE '''||v_search||'%''');
+		execute_query;
+	end if;
+	end;

@@ -1,0 +1,23 @@
+declare
+	u_id number;
+	u_blok varchar2(40);
+	u_user varchar2(50);
+	insert_count number;
+begin
+	u_id := :NEW.id;
+	u_blok :NEW.name;
+	u_user := USER;
+	inser_count := 0;
+	
+	INSERT INTO j_log(t_time,u_user,blok_tabela,ilosc_insert)
+	values (SYSDATE,u_id,u_user,u_blok,insert_count+1)
+end;
+
+declare
+v_param paramlist;
+BEGIN
+v_param:=get_parameter_list (nazwa_listy);
+add_parameter(v_param,'customer_id',wartosc z jakiego_blooku_danych);
+call_form('cust_details',no_hide,no_replace,no_query_only,v_param);
+destroy_parameter_list (v_param);
+end;

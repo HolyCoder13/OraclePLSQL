@@ -1,0 +1,11 @@
+declare
+	v_param paramlist;
+	v_number number;
+	v_item varchar2(50) := 'CUNTRIES.POLE_TEKSTOWE30';
+begin
+	v_param := create_parameter_list('LIST');
+	if :POLE_TEKSTOWE30 is not null then
+		v_number := :POLE_TEKSTOWE30;
+	else
+		v_number := :CUSTOMERS.CUST_ID;
+		end if;
