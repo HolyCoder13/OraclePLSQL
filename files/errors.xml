@@ -1,0 +1,18 @@
+<items>
+    <item type="editor" node="TableNode" vertical="true">
+    <title><![CDATA[ERRORS]]></title>
+    <query>
+        <sql>
+            <![CDATA[SELECT SESSION_USER UZYTKOWNIK_BAZY,
+						    DDL_DATE DATA,
+						    OBJECT_NAME OBIEKT,
+						    HOST HOST,
+						    OS_USER UZYTKOWNIK,
+						    TEXT NAZWA
+					 FROM   RTI_AUDIT_LOG 
+					 WHERE  TRUNC(DDL_DATE) = TRUNC(SYSDATE) 
+					 ORDER BY DDL_DATE DESC]]>
+        </sql>
+    </query>
+    </item>
+</items>

@@ -1,0 +1,15 @@
+<items>
+    <item type="editor" node="TableNode" vertical="true">
+    <title><![CDATA[PROG_LOG]]></title>
+    <query>
+        <sql>
+            <![CDATA[SELECT KOD_PUNKTU KOD,
+						    PARAMETRY_1 NAZWA,
+						    INSD DATA
+					 FROM   RTI_PROG_LOG 
+					 WHERE  PROGRAMISTA = 'HUBERTSK' 
+					 ORDER BY INSD DESC]]>
+        </sql>
+    </query>
+    </item>
+</items>

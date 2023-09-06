@@ -1,0 +1,94 @@
+--1
+select count(*) from hr.employees;
+select count(employee_id) from hr.employees;
+--2
+
+select avg(salary) from hr.employees where job_id like 'IT_PROG';
+--3
+select count(distinct first_name) from HR.employees where first_name like 'A%';
+
+--4
+select avg(salary), min(salary), max(salary) from hr.employees;
+--5
+select sum(salary), avg(salary), min(salary), max(salary) from hr.employees where job_id not like 'AD_PRES';
+
+--6
+select job_id, sum(salary),count(*) from HR.employees group by job_id;
+--7
+select count(*) from hr.employees group by job_id;
+--8
+select job_id, avg(salary), count(*) from hr.employees group by job_id
+having count(*)>=3;
+--9
+select first_name from hr.employees group by first_name
+having count(first_name)>=2;
+--10
+select * from hr.employees where avg(salary)>9000;
+--11
+select department_id, max(salary)-min(salary), count(*) from hr.employees
+group by department_id order by department_id;
+--12
+select max(salary) from hr.employees group by manager_id order by manager_id;
+--13
+select department_id, max(salary), count(*) from hr.employees
+group by department_id order by department_id;
+--14
+select count(employee_id), count(salary) from hr.employees group by department_id;
+--15
+
+--16
+select department_id,max(salary),count(*) from HR.employees where ;
+--17
+select department_id,min(salary) from hr.employees where lower(last_name) not like '%o%'
+group by department_id;
+--18
+select department_id,min(salary),max(salary),count(*) from hr.employees
+group by department_id having count(*)<5 order by department_id;
+--19
+select department_id,count(*) from hr.departments group by department_id having count(*)>1;
+--20
+
+--21
+
+--22
+select count(employee_id) from hr.employees group by department_id having count(*)>10 ;
+--23
+
+--24
+
+--25
+
+
+
+--5
+select sum(salary), avg(salary), min(salary), max(salary) from hr.employees where job_id not like 'AD_PRES';
+
+--9
+select first_name from hr.employees group by first_name
+having count(first_name)>=2;
+
+
+--10
+select department_id from hr.employees having avg(salary)>9000;
+
+--12
+select max(salary) from hr.employees group by manager_id order by manager_id;
+
+--13
+select department_id, max(salary), count(*) from hr.employees
+group by department_id order by department_id;
+
+--14
+select count(employee_id) as "liczba pracownikow", count(salary) as "liczba pensji" from hr.employees group by department_id;
+
+--22
+select count(employee_id) from hr.employees group by department_id having count(*)>10 ;
+
+--26
+select max(salary)-min(salary) from hr.employees where department_id like 50 or department_id like 60
+or department_id like 100 group by department_id;
+
+--29
+select count(department_id) from hr.departments group by location_id;
+--30
+select manager_id, count(*) from hr.employees group by manager_id having count(*)>1;

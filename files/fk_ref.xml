@@ -1,0 +1,24 @@
+<items>
+    <item type="editor" node="TableNode" vertical="true">
+    <title><![CDATA[FK References]]></title>
+    <query>
+        <sql>
+            <![CDATA[SELECT A.OWNER,
+						    A.TABLE_NAME,
+						    A.CONSTRAINT_NAME,
+						    A.STATUS
+					 FROM   ALL_CONSTRAINTS A
+					 WHERE  A.CONSTRAINT_TYPE = 'R'
+					 AND    EXISTS(
+								   SELECT 1
+								   FROM   ALL_CONSTRAINTS
+								   WHERE  CONSTRAINT_NAME=A.R_CONSTRAINT_NAME
+								   AND CONSTRAINT_TYPE IN ('P', 'U')
+								   AND TABLE_NAME = :OBJECT_NAME
+								   AND OWNER = :OBJECT_OWNER
+								  )
+					 ORDER BY TABLE_NAME, CONSTRAINT_NAME]]>
+        </sql>
+    </query>
+    </item>
+</items>
