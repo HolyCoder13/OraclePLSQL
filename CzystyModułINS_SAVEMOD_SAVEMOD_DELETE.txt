@@ -1,0 +1,315 @@
+PACKAGE SETTINGS IS
+  
+ 
+  --Procedura ustawiająca kolor przycisków listy wartości
+  --Sprawdza czy filtry są wybrane(czy wartości są uzupełnione) i ustawia kolor na niebieski lub szary
+  PROCEDURE SET_BUTTON_HEAD;
+	
+ 
+ 	--Procedura ustawiająca domyślny kolor dla sortowania  
+  PROCEDURE SORT_OFF;
+ 
+  --Procedura do zapisywania wstawiania
+	PROCEDURE INS_SAVE;
+
+  --Procedura do zapisywania szczegółów
+	PROCEDURE MOD_SAVE ;
+	
+	--Procedura do usuwania rekordu 
+  PROCEDURE MOD_DELETE;
+
+ 	
+END SETTINGS;
+
+
+PACKAGE BODY SETTINGS IS
+	--Najpierw wykonujemy Insert do tabeli
+	--INSERT INTO RTI_ZM_TYPY_ZMIENNYCH(KOD, NAZWA, ZMIENNE)
+  --VALUES('PER_UMOWA', 'Domyślne ustawienia formatki - Umowy cywilno-prawne', 'N');
+  --Uwaga! Gdy nie będzie tego rekordu w tabeli RTI_ZM_TYPY_ZMIENNYCH nie będzie się dało wyjść z formatki przy wybranych filtrach
+  
+	V_TYP RTI_ZM_TYPY_ZMIENNYCH.KOD%TYPE := 'PER_UMOWA';
+	
+	--Zmienna pakietowa przechowująca wartość czy są pola wymagane, które nie są uzupełnione (Wykorzysywana w procedurach INS_SAVE, MOD_SAVE poprzez proceduręVALIDATE_ITEM)
+	VALIDATE_ITEMS BOOLEAN;
+
+ 
+
+	--Procedura czyszcząca(F7)
+	PROCEDURE ENTQRY IS
+	BEGIN
+		
+		GO_BLOCK('MAIN_HEAD');
+		CLEAR_BLOCK(NO_VALIDATE);
+		GO_BLOCK('MAIN');
+		CLEAR_BLOCK(NO_VALIDATE);
+		
+	--	:PARAMETER.SEARCH   := 'OFF';
+--/	:PARAMETER.SIBLINGS := 'OFF';
+		SET_BLOCK_PROPERTY('MAIN', DEFAULT_WHERE, ' ');
+	--	SETTINGS.PRIVILEGES;
+		SETTINGS.SET_BUTTON_HEAD;
+
+	END ENTQRY;
+
+	--Procedura wczytująca(F8)
+	PROCEDURE EXEQRY IS 
+	BEGIN
+	  	
+	 	SET_BLOCK_PROPERTY('MAIN', DEFAULT_WHERE, ' ');
+		GO_ITEM('MAIN.POZYCJA');
+		EXECUTE_QUERY;
+	--	SETTINGS.PRIVILEGES;
+		SETTINGS.SET_BUTTON_HEAD;
+		
+	END EXEQRY;	
+	
+  --Procedura ustawiająca kolor przycisków listy wartości
+  PROCEDURE SET_BUTTON_HEAD IS
+    
+    --Na podstawie podanego w parametrze warunku P_CONDITION ustawia odpowiedni kolor dla przycisku podanego jako drugi parametr
+    PROCEDURE SET_BUTTON(P_CONDITION BOOLEAN, P_BUTTON IN VARCHAR2) IS
+		BEGIN
+			
+			IF P_CONDITION THEN
+				
+				SET_ITEM_PROPERTY(P_BUTTON, VISUAL_ATTRIBUTE, 'SEARCH_ON');
+		   
+			ELSE
+			
+				SET_ITEM_PROPERTY(P_BUTTON, VISUAL_ATTRIBUTE, 'SEARCH_OFF');
+				
+			END IF;
+			
+		END;
+ 
+  BEGIN
+	
+	  --Wywołanie procedur sprawdzających warunek logiczny pierwszego parametru i ustawiających odpowiedni kolor przycisku podanego jako drugi parametr
+		SET_BUTTON(:MAIN.TYP_PROJEKTU_KOD IS NOT NULL, 'MAIN.TYP_PROJEKTU_KOD');
+		SET_BUTTON(:MAIN.CHARAKTER IS NOT NULL, 'MAIN.CHARAKTER');   
+	--	SET_BUTTON(:MAIN_HEAD.STATUS_KOD IS NOT NULL, 'MAIN_HEAD.STATUS_LV');   	
+	--	SET_BUTTON(:PARAMETER.SEARCH = 'ON', 'MAIN_HEAD.SEARCH'); 		
+	--	SET_BUTTON(:PARAMETER.SIBLINGS = 'ON', 'MAIN_HEAD.SIBLINGS'); 
+
+	END	SET_BUTTON_HEAD;	
+
+  --Procedura ustawiająca kolor przycisku pozycji na kanwie MAIN
+--	PROCEDURE SET_BUTTON_MAIN IS
+--	BEGIN
+
+		--Niezakończone	
+	--	IF :MAIN.STATUS = '22' THEN
+		
+	--		SET_ITEM_INSTANCE_PROPERTY('MAIN.POZYCJA', CURRENT_RECORD, VISUAL_ATTRIBUTE, 'KOLOR_CZERWONY');
+			--Przeciążaona procedura z COMMON'a
+			--SET_VISUAL('MAIN.POZYCJA', 'KOLOR_CZERWONY');
+	
+		--Zakończone
+	--	IF :MAIN.STATUS = '21' THEN
+		
+		--	SET_ITEM_INSTANCE_PROPERTY('MAIN.POZYCJA', CURRENT_RECORD, VISUAL_ATTRIBUTE, 'KOLOR_CIEMNOSZARY');
+		
+		--W trakcie aneksowania
+	--	ELSIF :MAIN.STATUS = '12' THEN
+	
+		--	SET_ITEM_INSTANCE_PROPERTY('MAIN.POZYCJA', CURRENT_RECORD, VISUAL_ATTRIBUTE, 'KOLOR_NIEBIESKI');
+	
+		--Zatwierdzone
+	--	ELSIF :MAIN.STATUS = '15' THEN
+	
+		--	SET_ITEM_INSTANCE_PROPERTY('MAIN.POZYCJA', CURRENT_RECORD, VISUAL_ATTRIBUTE, 'KOLOR_SZARY');
+	
+		--W trakcie wprowadzania
+	--	ELSIF :MAIN.STATUS = '11' THEN
+	
+	--		SET_ITEM_INSTANCE_PROPERTY('MAIN.POZYCJA', CURRENT_RECORD, VISUAL_ATTRIBUTE, 'KOLOR_ZOLTY');
+	
+	--	END IF;
+
+	
+--	END SET_BUTTON_MAIN;
+
+ 
+
+
+ 	--Procedura ustawiająca domyślny kolor dla sortowania  
+  PROCEDURE SORT_OFF IS 
+  BEGIN
+  
+  	SET_ITEM_PROPERTY('MAIN_SORT.SORT_PRACOWNICY', VISUAL_ATTRIBUTE, 'SORT_OFF');
+		SET_ITEM_PROPERTY('MAIN_SORT.SORT_JEDNOSTKA',  VISUAL_ATTRIBUTE, 'SORT_OFF');
+		SET_ITEM_PROPERTY('MAIN_SORT.SORT_DATA_START', VISUAL_ATTRIBUTE, 'SORT_OFF');
+		SET_ITEM_PROPERTY('MAIN_SORT.SORT_DATA_STOP',  VISUAL_ATTRIBUTE, 'SORT_OFF');
+		
+  END SORT_OFF;
+	
+
+  --Procedura sprawdzająca czy podane pole w parametrze jest uzupełnione
+  --Jeśli jest puste to ustawia mu kolor i ustawia flagęSETTINGS.VALIDATE_ITEMS
+	PROCEDURE VALIDATE_ITEM(P_ITEM IN VARCHAR2) IS
+	BEGIN
+		
+		IF NAME_IN (P_ITEM) IS NULL THEN
+		
+			IF GET_ITEM_PROPERTY (P_ITEM, VISIBLE) = 'TRUE' THEN
+			
+				SET_ITEM_INSTANCE_PROPERTY(P_ITEM, CURRENT_RECORD, VISUAL_ATTRIBUTE, 'ITEM_FALSE');
+			
+			END IF;
+			
+			SETTINGS.VALIDATE_ITEMS := FALSE;
+				
+		ELSE
+		
+			IF GET_ITEM_PROPERTY (P_ITEM, VISIBLE) = 'TRUE' THEN
+	
+				SET_ITEM_INSTANCE_PROPERTY(P_ITEM, CURRENT_RECORD, VISUAL_ATTRIBUTE, 'ITEM_TRUE');
+			
+			END IF;
+		
+		END IF;
+
+		SYNCHRONIZE;
+
+	END VALIDATE_ITEM;
+
+  --Procedura do zapisywania wstawiania
+	PROCEDURE INS_SAVE IS
+	
+		V_RECORD VARCHAR2(50);
+	
+	BEGIN
+		
+		--Ustawienie flagi na TRUE
+		SETTINGS.VALIDATE_ITEMS := TRUE;
+			
+		--Sprawdzenie wymaganych pól czy są uzupełnione
+		SETTINGS.VALIDATE_ITEM('NOWY.ORD');
+		SETTINGS.VALIDATE_ITEM('NOWY.TYP_PROJEKTU');
+		SETTINGS.VALIDATE_ITEM('NOWY.CHARAKTER');
+
+		IF NOT SETTINGS.VALIDATE_ITEMS THEN
+		
+			KOMUNIKAT('Uzupełnij wymagane wartości zaznaczonych pól');
+		
+		ELSE
+			
+			--Zapisanie zmian
+			COMMIT_FORM;
+
+			--Sprawdzenie czy zapisanie zmian się powiodło
+			IF :SYSTEM.FORM_STATUS = 'QUERY' THEN
+				
+				--Zapisanie ROWID wstawionego rekordu do zmiennej
+				V_RECORD := :NOWY.ID;	
+			
+				--Wyłączenie wyszukiwarki
+				--:PARAMETER.SEARCH := 'OFF';
+			
+				--Wczytanie danych
+				SETTINGS.EXEQRY;
+	
+				--Pętla ustawiająca bieżący rekord na nowowstawionym
+				LOOP
+					
+					EXIT WHEN :MAIN.ROWID = V_RECORD OR :SYSTEM.LAST_RECORD = 'TRUE';
+					NEXT_RECORD;
+				
+				END LOOP;
+				
+			ELSE
+				
+				KOMUNIKAT ('Wystąpił błąd podczas zapisu');
+				RAISE FORM_TRIGGER_FAILURE;
+				
+			END IF;	
+			
+		END IF;
+
+	END INS_SAVE;
+		
+  --Procedura do zapisywania szczegółów		
+	PROCEDURE MOD_SAVE IS
+	
+		V_RECORD VARCHAR2(50);
+	
+	BEGIN
+			
+		--Ustawienie flagi na TRUE	
+		SETTINGS.VALIDATE_ITEMS := TRUE;
+
+		--Sprawdzenie wymaganych pól czy są uzupełnione			
+		SETTINGS.VALIDATE_ITEM('MOD.ORD');
+		SETTINGS.VALIDATE_ITEM('MOD.TYP_OPERACJI');
+		SETTINGS.VALIDATE_ITEM('MOD.TYP_PROJEKTU');
+		SETTINGS.VALIDATE_ITEM('MOD.CHARAKTER');
+		
+		IF NOT SETTINGS.VALIDATE_ITEMS THEN
+		
+			KOMUNIKAT ('Uzupełnij wymagane wartości zaznaczonych pól');
+	
+		ELSE
+			
+			--Zapisanie zmian
+			COMMIT_FORM;
+
+			--Sprawdzenie czy zapisanie zmian się powiodło
+			IF :SYSTEM.FORM_STATUS = 'QUERY' THEN
+				
+				--Zapisanie ROWID wstawionego rekordu do zmiennej
+				V_RECORD := :MOD.ROWID;	
+			
+				--Wyłączenie wyszukiwarki
+			--	:PARAMETER.SEARCH := 'OFF';
+			
+				--Wczytanie danych
+				SETTINGS.EXEQRY;
+	
+				--Pętla ustawiająca bieżący rekord na nowowstawionym
+				LOOP
+					
+					EXIT WHEN :MAIN.ROWID = V_RECORD OR :SYSTEM.LAST_RECORD = 'TRUE';
+					NEXT_RECORD;
+				
+				END LOOP;
+				
+			ELSE
+				
+				KOMUNIKAT ('Wystąpił błąd podczas zapisu');
+				RAISE FORM_TRIGGER_FAILURE;
+				
+			END IF;	
+			
+		END IF;
+		
+	END MOD_SAVE;
+	
+	--Procedura do usuwania rekordu 
+	PROCEDURE MOD_DELETE IS
+	BEGIN
+		
+		--Usunięcie rekordu
+		DELETE_RECORD;
+		
+		--Zapisanie zmian
+		COMMIT_FORM;
+
+		--Zapisanie do logów
+		S4A_FORM.DZIENNIKA('A010202', 'TEST');
+
+	  --Wczytanie danych
+		SETTINGS.EXEQRY;
+		
+		--Sprawdzenie czy usunięcie przebiegło poprawnie
+		IF :SYSTEM.FORM_STATUS <> 'QUERY' THEN 
+		
+			KOMUNIKAT ('Operacja zakończona niepowodzeniem');
+	
+		END IF;
+		
+	END MOD_DELETE;
+	
+  
+END SETTINGS;
+
