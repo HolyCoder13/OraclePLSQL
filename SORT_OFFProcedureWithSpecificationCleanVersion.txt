@@ -1,0 +1,87 @@
+PACKAGE SETTINGS IS
+
+
+	--Procedura czyszcząca(F7)
+	PROCEDURE ENTQRY;
+
+	--Procedura wczytująca(F8)
+	PROCEDURE EXEQRY;
+	
+
+ 	--Procedura ustawiająca domyślny kolor dla sortowania  
+  PROCEDURE SORT_OFF;
+  
+  PROCEDURE SET_BUTTON_HEAD;
+  
+  
+END SETTINGS;
+
+
+
+PACKAGE BODY SETTINGS IS
+	--Najpierw wykonujemy Insert do tabeli
+	--INSERT INTO RTI_ZM_TYPY_ZMIENNYCH(KOD, NAZWA, ZMIENNE)
+  --VALUES('PER_UMOWA', 'Domyślne ustawienia formatki - Umowy cywilno-prawne', 'N');
+  --Uwaga! Gdy nie będzie tego rekordu w tabeli RTI_ZM_TYPY_ZMIENNYCH nie będzie się dało wyjść z formatki przy wybranych filtrach
+  
+	--Procedura czyszcząca(F7)
+	PROCEDURE ENTQRY IS
+	BEGIN
+		
+		GO_BLOCK('MAIN');
+		CLEAR_BLOCK(NO_VALIDATE);
+		
+		:PARAMETER.SEARCH   := 'OFF';
+		SET_BLOCK_PROPERTY('MAIN', DEFAULT_WHERE, ' ');
+		SETTINGS.SET_BUTTON_HEAD;
+	END ENTQRY;
+
+	--Procedura wczytująca(F8)
+	PROCEDURE EXEQRY IS 
+	BEGIN
+	  	
+	 	SET_BLOCK_PROPERTY('MAIN', DEFAULT_WHERE, ' ');
+		GO_ITEM('MAIN.PRZYCISK');
+		EXECUTE_QUERY;
+			SETTINGS.SET_BUTTON_HEAD;
+	END EXEQRY;	
+	
+ 
+
+   --Procedura ustawiająca kolor przycisków listy wartości
+  PROCEDURE SET_BUTTON_HEAD IS
+    
+    --Na podstawie podanego w parametrze warunku P_CONDITION ustawia odpowiedni kolor dla przycisku podanego jako drugi parametr
+    PROCEDURE SET_BUTTON(P_CONDITION BOOLEAN, P_BUTTON IN VARCHAR2) IS
+		BEGIN
+			
+			IF P_CONDITION THEN
+				
+				SET_ITEM_PROPERTY(P_BUTTON, VISUAL_ATTRIBUTE, 'SEARCH_ON');
+		   
+			ELSE
+			
+				SET_ITEM_PROPERTY(P_BUTTON, VISUAL_ATTRIBUTE, 'SEARCH_OFF');
+				
+			END IF;
+			
+		END;
+ 
+  BEGIN
+	
+	  --Wywołanie procedur sprawdzających warunek logiczny pierwszego parametru i ustawiających odpowiedni kolor przycisku podanego jako drugi parametr 	
+		SET_BUTTON(:PARAMETER.SEARCH = 'ON', 'MAIN.SEARCH'); 		
+	
+
+	END	SET_BUTTON_HEAD;
+
+
+
+ 	--Procedura ustawiająca domyślny kolor dla sortowania  
+  PROCEDURE SORT_OFF IS 
+  BEGIN
+		SET_ITEM_PROPERTY('MAIN_SORT.SORT_NAZWA',  VISUAL_ATTRIBUTE, 'SORT_OFF');
+  END SORT_OFF;
+
+
+END SETTINGS;
