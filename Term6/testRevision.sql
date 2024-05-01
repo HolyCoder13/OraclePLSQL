@@ -242,6 +242,93 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Wyst?pi? inny b??d!');
 END;
 /
+SET SERVEROUTPUT ON;
+declare 
+cursor c is
+select first_name, last_name, hire_date
+from pracownicy_am where job_id like 'IT_PROG';
+r_p c%ROWTYPE;
+begin
+open c;
+loop
+fetch c into r_p;
+exit when c%NOTFOUND;
+dbms_output.put_line(r_p.first_name||' '||
+r_p.last_name||' '||
+r_p.hire_date);
+end loop;
+close c;
+end;
+/
+select * from pracownicy_am;
+/
+declare
+cursor c is
+select first_name, last_name, salary from
+pracownicy_am order by salary desc;
+r_p c%ROWTYPE;
+begin
+open c;
+loop
+fetch c into r_p;
+dbms_output.put_line(r_p.first_name||' '
+||r_p.last_name||' '||r_p.salary);
+exit when c%ROWCOUNT > 5;
+end loop;
+close c;
+end;
+/
+declare 
+n number;
+potega number := 1;
+begin
+n := &n;
+for i in 1..n loop
+potega := potega * 3;
+dbms_output.put_line(potega);
+end loop;
+end;
+/
+--4
+declare 
+cursor c is
+select first_name, last_name, salary 
+from pracownicy_am where job_id = 'IT_PROG';
+r_p c%ROWTYPE;
+begin
+update pracownicy_am 
+set salary = salary+100 
+where job_id = 'IT_PROG';
+open c;
+loop
+fetch c into r_p;
+exit when c%NOTFOUND;
+dbms_output.put_line('Po zmianie :' ||r_p.first_name||
+' '||r_p.last_name||' '|| r_p.salary);
+end loop;
+close c;
+end;
+/
+--5
+declare 
+v_l char(1);
+cursor c is
+select FIRST_name, last_name, job_id
+from pracownicy_am WHERE 
+UPPER(SUBSTR(last_name, 1, 1)) = UPPER(v_l);
+r_p c%ROWTYPE;
+begin
+ v_l := UPPER(SUBSTR('&Podaj_litere_nazwiska_pracownika', 1, 1));
+ open c;
+ loop
+ fetch c into r_p;
+DBMS_OUTPUT.PUT_LINE(r_p.last_name || ' ' ||
+                     r_p.first_name || ' ' ||
+                     r_p.job_id);
+exit when c%NOTFOUND;
+end loop;
+close c;
+end;
 
 
 
