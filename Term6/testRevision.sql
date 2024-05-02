@@ -329,7 +329,95 @@ exit when c%NOTFOUND;
 end loop;
 close c;
 end;
+/
+create table pracownicy_am as 
+select * from hr.employees;
+set serveroutput on;
+drop table pracownicy_am;
+select * from pracownicy_am;
+select * from hr.departments;
+--4
+declare
+cursor c is
+select employee_id, first_name, last_name, job_id
+from pracownicy_am where to_char(hire_date,'yyyy')<2003;
+r_p c%ROWTYPE;
+v_l number;
+begin
+select count(*)
+into v_l
+from pracownicy_am 
+where to_char(hire_date,'yyyy')<2003;
+dbms_output.put_line('usunietych '||v_l);
+open c;
+loop
+fetch c into r_p;
+exit when c%NOTFOUND;
+dbms_output.put_line('Usunieci: '||r_p.first_name||' '||r_p.last_name||' '
+||r_p.job_id);
+end loop;
+close c;
+delete from pracownicy_am where to_char(hire_date,'yyyy')<2003;
+EXCEPTION
+When NO_DATA_FOUND
+then dbms_output.put_line('Brak pracowników ');
+end;
+/
+--5
+declare
+v_job pracownicy_am.job_id%TYPE;
+cursor c is
+select first_name, last_name, commission_pct
+from pracownicy_am where job_id = v_job;
+r_p c%ROWTYPE;
+begin
+v_job := UPPER('&job_id');
+open c;
+loop
+fetch c into r_p;
+exit when c%NOTFOUND;
+if r_p.commission_pct is not null then 
+dbms_output.put_line('pracownik '||r_p.first_name||' '||r_p.last_name||
+' posiada premie '||r_p.commission_pct);
+else
+dbms_output.put_line('pracownik '||r_p.first_name||' '||r_p.last_name||
+' nie posiada premii '||r_p.commission_pct);
+end if;
+end loop;
+close c;
+end;
+/
+--6
+declare 
+v_d number;
+cursor c is
+select first_name, last_name, salary, department_id 
+from pracownicy_am where department_id = v_d;
+r_p c%ROWTYPE;
+begin
+v_d := TO_NUMBER('&department_id');
+open c;
+loop
+fetch c into r_p;
+exit when c%NOTFOUND;
+dbms_output.put_line('Przed podywzka '||r_p.first_name||' '||r_p.last_name||
+' '||r_p.salary||' '||r_p.department_id);
+update pracownicy_am 
+set commission_pct = commission_pct + 0.5
+where department_id = v_d;
+dbms_output.put_line('Po podwyzce '||r_p.first_name||' '||r_p.last_name||
+' '||r_p.salary||' '||r_p.department_id);
+end loop;
+close c;
+EXCEPTION
+    WHEN VALUE_ERROR THEN
+        DBMS_OUTPUT.PUT_LINE('Bledny numer departamentu!');
 
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Wystapil inny blad!');
+end;
+/
+select * from pracownicy_am where department_id = 60;
 
 
 
