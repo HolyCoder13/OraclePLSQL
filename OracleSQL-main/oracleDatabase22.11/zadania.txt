@@ -1,0 +1,33 @@
+
+--5
+select sum(salary), avg(salary), min(salary), max(salary) from hr.employees where job_id not like 'AD_PRES';
+
+--9
+select first_name from hr.employees group by first_name
+having count(first_name)>=2;
+
+
+--10
+select department_id from hr.employees having avg(salary)>9000;
+
+--12
+select max(salary) from hr.employees group by manager_id order by manager_id;
+
+--13
+select department_id, max(salary), count(*) from hr.employees
+group by department_id order by department_id;
+
+--14
+select count(employee_id) as "liczba pracownikow", count(salary) as "liczba pensji" from hr.employees group by department_id;
+
+--22
+select count(employee_id) from hr.employees group by department_id having count(*)>10 ;
+
+--26
+select max(salary)-min(salary) from hr.employees where department_id like 50 or department_id like 60
+or department_id like 100 group by department_id;
+
+--29
+select count(department_id) from hr.departments group by location_id;
+--30
+select manager_id, count(*) from hr.employees group by manager_id having count(*)>1;

@@ -1,0 +1,21 @@
+create table ex3(sum number);
+drop table ex3;
+create or replace function f1
+(
+p in number default 100
+) return number as
+p_result number;
+cursor matematyka is
+select * from ex3 order by 1;
+p_row ex3%rowtype;
+begin 
+open matematyka;
+loop
+fetch matematyka into p_row;
+if p_row.suma>p then
+p_result:=p_row.iteracja;
+exit;
+end if;
+end loop;
+end f1;
+

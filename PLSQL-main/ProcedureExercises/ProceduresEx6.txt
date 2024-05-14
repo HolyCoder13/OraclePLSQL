@@ -1,0 +1,48 @@
+begin
+display_employee_details(104);
+end;
+
+
+CREATE OR REPLACE PROCEDURE display_employee_details (p_employee_id IN hr.employees.employee_id%TYPE) AS
+  v_first_name hr.employees.first_name%TYPE;
+  v_last_name hr.employees.last_name%TYPE;
+  v_phone_number hr.employees.phone_number%TYPE;
+BEGIN
+  SELECT first_name, last_name, phone_number INTO v_first_name, v_last_name, v_phone_number 
+  FROM hr.employees
+  WHERE employee_id = p_employee_id;
+
+  DBMS_OUTPUT.PUT_LINE('Employee ID: ' || p_employee_id);
+  DBMS_OUTPUT.PUT_LINE('First name: ' || v_first_name);
+  DBMS_OUTPUT.PUT_LINE('Last name: ' || v_last_name);
+  DBMS_OUTPUT.PUT_LINE('Phone number: ' || v_phone_number);
+END;
+
+DECLARE
+  v_manager_count INTEGER;
+  v_first_name hr.employees.first_name%TYPE;
+  v_last_name hr.employees.last_name%TYPE;
+BEGIN
+  SELECT COUNT(*) INTO v_manager_count
+  FROM hr.employees
+  WHERE manager_id = 100;
+
+  IF v_manager_count > 0 THEN
+    SELECT first_name, last_name INTO v_first_name, v_last_name
+    FROM hr.employees
+    WHERE employee_id = 100;
+    
+    DBMS_OUTPUT.PUT_LINE(v_first_name || ' ' || v_last_name || ' is a manager with ' || v_manager_count || ' direct reports.');
+  ELSE
+    SELECT first_name, last_name INTO v_first_name, v_last_name
+    FROM hr.employees
+    WHERE employee_id = 100;
+    
+    DBMS_OUTPUT.PUT_LINE(v_first_name || ' ' || v_last_name || ' is not a manager.');
+  END IF;
+END;
+
+
+ SELECT COUNT(*)
+  FROM hr.employees
+  WHERE manager_id = 100;
