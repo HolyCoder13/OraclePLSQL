@@ -80,3 +80,35 @@ Create or Replace PACKAGE BODY Tekstowe2 AS
 
 END TEKSTOWE2
 /
+Create or Replace Package PlacaAM IS
+procedure ZmienPensja(id_p in number, kwota in number, p_decyzja in char);
+end PlacaAM;
+/
+Create or Replace Package Body PlacaAM is
+procedure ZmienPensja(id_p in number, kwota in number, p_decyzja in char) is
+begin
+if p_decyzja='p'
+then update pracownicy_am set salary=salary+kwota where employee_id = id_p;
+else update pracownicy_am set salary=salary-kwota where employee_id = id_p;
+end if;
+end ZmienPensja;
+end PlacaAM;
+/
+create table dummy_tableAM as select * from hr.employees;
+drop table departament_AM;
+create table departamenty_AM as select * from hr.departments;
+select * from departamenty_AM;
+/
+Create or Replace VIEW widok_J AS
+select d.department_name, count(p.employee_id) as liczba 
+from pracownicy_AM p join departamenty_AM d on p.department_id = d.department_id
+GROUP BY d.department_name;
+/
+Create Trigger insert_dep
+INSTEAD of insert on dummy_tableAM
+Begin
+insert into departamenty_AM(department_id, department_name)
+VALUES((select max(department_id)+10 from departamenty), :NEW.department_name);
+END;
+/
+--grant execute on 
